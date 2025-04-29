@@ -1,107 +1,126 @@
-# Ex28 Dijkstra’s Algorithm
+# Ex27 Kruskal’s Algorithm
 ## DATE:
 ## AIM:
-To write a C Program to implement Dijkstra's Algorithm to find the shortest path
+To write a C program to implement Kruskal's Algorithm for finding minimum cost
 
 ## Algorithm
 1. Start
-2. Read the number of vertices n and the adjacency matrix G representing the graph.
-3. Read the starting node u for Dijkstra's algorithm.
-4. Create the cost matrix where each G[i][j] is copied, and replace 0 values with infinity 
-(except for the diagonal).
-5. Initialize the distance, pred, and visited arrays.
-6. For each node, find the one with the minimum distance that hasn't been visited. Update the 
-distances and predecessors of its unvisited neighbors.
-7. Repeat the process until all nodes are visited.
-8. After the algorithm completes, print the shortest distance from the start node to each node 
-and the path taken to reach each node.
-9. End   
+2. Read the number of vertices n and the adjacency matrix G.
+3. Initialize the edge list elist and extract all edges from the matrix into elist.
+4. Sort the edges in increasing order of weight.
+5. Initialize a belongs array where each vertex is initially in its own set.
+6. Process each edge, checking if the vertices belong to different sets using find. If they do, add 
+the edge to the spanlist and unite the sets using union1.
+7. Print the edges of the minimum spanning tree along with its total cost.
+8. End   
 
 ## Program:
 ```
 /*
-Program to implement Dijkstra's Algorithm 
+Program to implement Kruskal's Algorithm
 Developed by: Tarun S
 RegisterNumber: 212223040226
 */
 #include<stdio.h> 
-#defineINFINITY9999
-#define MAX10
-voiddijkstra(int G[MAX][MAX],int n,intstartnode); 
+#defineMAX30
+typedefstruct edge
+{
+int u,v,w;
+}edge;
+typedefstruct edgelist
+{
+edgedata[MAX]; 
+int n;
+}edgelist; 
+edgelist elist;
+int G[MAX][MAX],n;
+edgelist spanlist;
+voidkruskal();
+int find(int belongs[],int vertexno); 
+voidunion1(int belongs[],int c1,int c2);
+void sort(); 
+voidprint();
 int main()
 {
-int G[MAX][MAX],i,j,n,u; 
+int i,j; 
 scanf("%d",&n); 
 for(i=0;i<n;i++) 
 for(j=0;j<n;j++) 
 scanf("%d",&G[i][j]); 
-scanf("%d",&u);
-dijkstra(G,n,u); 
-return 0;
+kruskal();
+print(); 
+return0;
 }
-void dijkstra(int G[MAX][MAX],int n,intstartnode)
+voidkruskal()
 {
-int cost[MAX][MAX],distance[MAX],pred[MAX]; 
-int visited[MAX],count,mindistance,nextnode,i,j;
-//pred[]storesthe predecessor ofeach node
-//count givesthe number ofnodesseenso far
-//createthecost matrix 
+int belongs[MAX],i,j,cno1,cno2; 
+elist.n=0;
+for(i=1;i<n;i++) 
+for(j=0;j<i;j++) 
+if(G[i][j]!=0)
+{
+elist.data[elist.n].u=i; 
+elist.data[elist.n].v=j; 
+elist.data[elist.n].w=G[i][j]; 
+elist.n++;
+//---
+}
+sort(); 
 for(i=0;i<n;i++) 
-for(j=0;j<n;j++) 
-if(G[i][j]==0) 
-cost[i][j]=INFINITY; 
-else
-cost[i][j]=G[i][j];
-//initializepred[],distance[] andvisited[] 
-for(i=0;i<n;i++)
+belongs[i]=i; 
+spanlist.n=0; 
+for(i=0;i<elist.n;i++)
 {
-distance[i]=cost[startnode][i]; 
-pred[i]=startnode; 
-visited[i]=0;
+cno1=find(belongs,elist.data[i].u); 
+cno2=find(belongs,elist.data[i].v); 
+if(cno1!=cno2)
+{
+spanlist.data[spanlist.n]=elist.data[i]; 
+spanlist.n=spanlist.n+1; 
+union1(belongs,cno1,cno2);
 }
-distance[startnode]=0; 
-visited[startnode]=1; 
-count=1; 
-while(count<n-1)
+}
+}
+int find(int belongs[],int vertexno)
 {
-mindistance=INFINITY;
-//nextnode givesthe nodeat minimumdistance 
+return(belongs[vertexno]);
+}
+void union1(int belongs[],int c1,int c2)
+{
+int i; 
 for(i=0;i<n;i++) 
-if(distance[i]<mindistance&&!visited[i])
+if(belongs[i]==c2) 
+belongs[i]=c1;
+}
+void sort()
 {
-mindistance=distance[i]; 
-nextnode=i;
-}
-//check ifa better pathexiststhroughnextnode 
-visited[nextnode]=1;
-for(i=0;i<n;i++) 
-if(!visited[i])
-if(mindistance+cost[nextnode][i]<distance[i])
+int i,j; 
+edgetemp;
+for(i=1;i<elist.n;i++) 
+for(j=0;j<elist.n-1;j++) 
+if(elist.data[j].w>elist.data[j+1].w)
 {
-distance[i]=mindistance+cost[nextnode][i]; 
-pred[i]=nextnode;
+temp=elist.data[j]; 
+elist.data[j]=elist.data[j+1]; 
+elist.data[j+1]=temp;
 }
-count++;
 }
-//print the pathand distanceofeachnode
-for(i=0;i<n;i++) 
-if(i!=startnode)
+voidprint()
 {
-printf("Distanceofnode%d=%d\n",i,distance[i]); 
-printf("Path=%d",i);
-j=i; 
-do{
-j=pred[j]; 
-printf("<-%d",j);
-}while(j!=startnode);
+int i,cost=0; 
+for(i=0;i<spanlist.n;i++)
+{
+printf("%d%d%d\n",spanlist.data[i].u,spanlist.data[i].v,spanlist.data[i].w); 
+cost=cost+spanlist.data[i].w;
 }
+printf("Cost ofthe spanning tree=%d\n",cost);
 }
 ```
 
 ## Output:
 
-![image](https://github.com/user-attachments/assets/fd6fc894-742f-42fb-8d92-aead677186c0)
+![image](https://github.com/user-attachments/assets/db3f5a79-c48d-42ec-8a55-b709a5340eac)
 
 
 ## Result:
-Thus, the Program to implement Dijkstra's Algorithm to find the shortest path is implemented successfully.
+Thus, the C program to implement Kruskal's Algorithm for finding minimum cost is implemented successfully.
